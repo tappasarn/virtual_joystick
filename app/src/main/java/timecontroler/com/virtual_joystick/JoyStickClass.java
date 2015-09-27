@@ -1,13 +1,11 @@
 package timecontroler.com.virtual_joystick;
 
-/**
- * Created by admin on 9/25/2015.
- */
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +44,6 @@ public class JoyStickClass {
         mContext = context;
 
         stick = BitmapFactory.decodeResource(mContext.getResources(), stick_res_id);
-
         stick_width = stick.getWidth();
         stick_height = stick.getHeight();
 
@@ -62,13 +59,25 @@ public class JoyStickClass {
         distance = (float) Math.sqrt(Math.pow(position_x, 2) + Math.pow(position_y, 2));
         angle = (float) cal_angle(position_x, position_y);
 
+        // Log.i("DEBUG", arg1.toString());
+        Log.i("DEBUG", "X pos " + String.valueOf(position_x));
+        Log.i("DEBUG", "Y pos " + String.valueOf(position_y));
+        Log.i("DEBUG", "Distance " + String.valueOf(distance));
+        Log.i("DEBUG", "Bound" + String.valueOf(params.width / 2));
 
         if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
+
             if(distance <= (params.width / 2) - OFFSET) {
+
+                Log.i("", "Draw");
+
                 draw.position(arg1.getX(), arg1.getY());
                 draw();
                 touch_state = true;
             }
+
+            Log.i("", "Not Draw");
+
         } else if(arg1.getAction() == MotionEvent.ACTION_MOVE && touch_state) {
             if(distance <= (params.width / 2) - OFFSET) {
                 draw.position(arg1.getX(), arg1.getY());
@@ -258,7 +267,8 @@ public class JoyStickClass {
         mLayout.addView(draw);
     }
 
-    private class DrawCanvas extends View{
+    private class DrawCanvas extends View {
+
         float x, y;
 
         private DrawCanvas(Context mContext) {

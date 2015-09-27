@@ -1,7 +1,10 @@
 package timecontroler.com.virtual_joystick;
 
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -10,18 +13,25 @@ import android.app.Activity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
+
     RelativeLayout layout_joystick;
-    ImageView image_joystick, image_border;
+    FrameLayout frame_layout;
     TextView textView1, textView2, textView3, textView4, textView5;
+
+    float xRef, yRef;
+
 
     JoyStickClass js;
 
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -31,7 +41,8 @@ public class MainActivity extends AppCompatActivity{
         textView4 = (TextView)findViewById(R.id.textView4);
         textView5 = (TextView)findViewById(R.id.textView5);
 
-        layout_joystick = (RelativeLayout)findViewById(R.id.layout_joystick);
+        frame_layout = (FrameLayout) findViewById(R.id.frame_layout);
+        layout_joystick = (RelativeLayout) findViewById(R.id.layout_joystick);
 
         js = new JoyStickClass(getApplicationContext(), layout_joystick, R.drawable.image_button);
         js.setStickSize(150, 150);
@@ -41,11 +52,82 @@ public class MainActivity extends AppCompatActivity{
         js.setOffset(90);
         js.setMinimumDistance(50);
 
+        frame_layout.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+
+                    float xPos = event.getX();
+                    float yPos = event.getY();
+
+                    xRef = xPos;
+                    yRef = yPos;
+
+                    Log.i("DEBUG", "X POS: " + xPos);
+                    Log.i("DEBUG", "Y POS: " + yPos);
+
+                    frame_layout.removeView(layout_joystick);
+
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT
+                    );
+
+                    final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
+
+                    params.height = 500;
+                    params.width = 500;
+                    params.gravity = Gravity.TOP;
+                    params.topMargin = (int) yPos - (params.height / 2);
+                    params.leftMargin = (int) xPos - (params.width / 2);
+
+                    frame_layout.addView(layout_joystick, params);
+
+                }
+
+                // Obtain MotionEvent object
+                long downTime = SystemClock.uptimeMillis();
+                long eventTime = SystemClock.uptimeMillis() + 100;
+                float x = 250f + (event.getX() - xRef);
+                float y = 250f + (event.getY() - yRef);
+// List of meta states found here: developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
+                int metaState = 0;
+                MotionEvent motionEvent = MotionEvent.obtain(
+                        downTime,
+                        eventTime,
+                        event.getAction(),
+                        x,
+                        y,
+                        metaState
+                );
+
+// Dispatch touch event to view
+                layout_joystick.dispatchTouchEvent(motionEvent);
+
+                return true;
+            }
+        });
+
+
         layout_joystick.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View arg0, MotionEvent arg1) {
+
                 js.drawStick(arg1);
+
+                /*
+                Log.i("DEBUG", "event received");
+                Log.i("DEBUG", arg1.toString());
+                Log.i("DEBUG", String.valueOf(arg1.getX()));
+                Log.i("DEBUG", String.valueOf(arg1.getY()));
+                Log.i("DEBUG", String.valueOf(arg1.getAction()));
+*/
+
                 if(arg1.getAction() == MotionEvent.ACTION_DOWN
                         || arg1.getAction() == MotionEvent.ACTION_MOVE) {
+
+                    // Log.i("DEBUG", "in block");
+
                     textView1.setText("X : " + String.valueOf(js.getX()));
                     textView2.setText("Y : " + String.valueOf(js.getY()));
                     textView3.setText("Angle : " + String.valueOf(js.getAngle()));
