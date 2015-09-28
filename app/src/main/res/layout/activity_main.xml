@@ -64,7 +64,7 @@
         android:layout_height="200dp"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="29dp"
-        android:background="@drawable/image_button_bg" >
+        android:background="@drawable/joystick_bg" >
     </RelativeLayout>
 
 </FrameLayout>

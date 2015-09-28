@@ -5,13 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
-public class JoyStickClass {
+public class JoyStick {
     public static final int STICK_NONE = 0;
     public static final int STICK_UP = 1;
     public static final int STICK_UPRIGHT = 2;
@@ -40,7 +39,7 @@ public class JoyStickClass {
 
     private boolean touch_state = false;
 
-    public JoyStickClass (Context context, ViewGroup layout, int stick_res_id) {
+    public JoyStick(Context context, ViewGroup layout, int stick_res_id) {
         mContext = context;
 
         stick = BitmapFactory.decodeResource(mContext.getResources(), stick_res_id);
@@ -59,25 +58,12 @@ public class JoyStickClass {
         distance = (float) Math.sqrt(Math.pow(position_x, 2) + Math.pow(position_y, 2));
         angle = (float) cal_angle(position_x, position_y);
 
-        // Log.i("DEBUG", arg1.toString());
-        Log.i("DEBUG", "X pos " + String.valueOf(position_x));
-        Log.i("DEBUG", "Y pos " + String.valueOf(position_y));
-        Log.i("DEBUG", "Distance " + String.valueOf(distance));
-        Log.i("DEBUG", "Bound" + String.valueOf(params.width / 2));
-
         if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
-
             if(distance <= (params.width / 2) - OFFSET) {
-
-                Log.i("", "Draw");
-
                 draw.position(arg1.getX(), arg1.getY());
                 draw();
                 touch_state = true;
             }
-
-            Log.i("", "Not Draw");
-
         } else if(arg1.getAction() == MotionEvent.ACTION_MOVE && touch_state) {
             if(distance <= (params.width / 2) - OFFSET) {
                 draw.position(arg1.getX(), arg1.getY());
